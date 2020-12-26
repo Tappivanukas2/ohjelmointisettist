@@ -11,6 +11,7 @@ elementit = {
     "tekstilaatikko": "Luettiin {rivit} tiedostoa.",
     "virheviesti": "Ei sopivaa dataa luettavaksi",
     "virheviesti2": "Ei kuvaajaa tallennettavana",
+    "virheviesti3": "Tasoitus ei toimi",
     "piirtoalue": None,
     "kuvaaja": None,
     "xpisteet": [],
@@ -33,42 +34,54 @@ def poista_lineaarinen_tausta():
     """
     try:
         i = 0
-        y1 = elementit["ydata"]# + np.polyval([0.002,-0.08,5], elementit["xdata"])
-        y2 = [None]
+        #datapisteiden valinta
+        xpoint0 = elementit["xpisteet"][-2]; xpoint1 = elementit["xpisteet"][-1]
+        ypoint0 = elementit["ypisteet"][-2]; ypoint1 = elementit["ypisteet"][-1]
+
+        kulmakerroin = float((ypoint1 - ypoint0) / (xpoint0 - xpoint1))
+        vakiotermi = float((xpoint0 * ypoint1 - xpoint0 * ypoint1) / (xpoint1 - xpoint0))
+
+        #linydatan putsaus ennen uusia laskuja
+        for j in range(len(elementit["linydata"])):
+            elementit["linydata"] = np.delete(elementit["linydata"], [0])
+        
+        #linydatan laskenta
         for k in range(len(elementit["ydata"])):
             try:
-                kulmakerroin = float((y1[i+1] - y1[i]) / (elementit["xdata"][i+1] - elementit["xdata"][i]))
-                vakiotermi = float((elementit["xdata"][i+1] * y1[i] - elementit["xdata"][i] * y1[i+1]) / (elementit["xdata"][i+1] - elementit["xdata"][i]))
-                y = kulmakerroin * elementit["xdata"][i] + abs(vakiotermi) #y-arvo x-akselin pisteessä
+                y = kulmakerroin * elementit["xdata"][i] + vakiotermi
                 yvanha = elementit["ydata"][i]
-                uusiy = yvanha - y
-                newy = abs(uusiy)
-                y2.append(newy)
+                newy = yvanha - y
                 elementit["linydata"] = np.append(elementit["linydata"], newy)
                 i += 1
             except IndexError:
                 continue
+        #kuvaajan piirto
         elementit["ax"].cla()
         elementit["ax"].set_xlabel("Binding energy(eV)")
         elementit["ax"].set_ylabel("Intensity (arbitary units)")
-        elementit["ax"].plot(elementit["xdata"], y2)
+        elementit["ax"].plot(elementit["xdata"], elementit["linydata"])
         elementit["piirtoalue"].draw()
-        y2.clear()
     except ValueError:
         ik.kirjoita_tekstilaatikkoon(elementit["laatikko1"],
-        elementit["virheviesti"], tyhjaa=False)
+        elementit["virheviesti3"], tyhjaa=False)
         return
 
-
-def laske_ydata(y0, y1, y2, y3, y4, y5, y6, y7, y8, y9, y10, y11, y12, y13, y14, y15, y16, y17, y18, y19):
+def laske_ydata(ydata):
     i = 0
     try:
-        for x in range(len(y1)):
-            y = y0[i]+y1[i]+y2[i]+y3[i]+y4[i]+y5[i]+y6[i]+y7[i]+y8[i]+y9[i]+y10[i]+y11[i]+y12[i]+y13[i]+y14[i]+y15[i]+y16[i]+y17[i]+y18[i]+y19[i]
+        for z in enumerate(ydata[0]):
+            y = 0
+            k = 0
+            for x in ydata:
+                y += ydata[k][i]
+                k += 1
+            print(y)
             elementit["ydata"] = np.append(elementit["ydata"], y)
             i += 1
-    except IndexError:
-        return
+        print(len(elementit["ydata"]))
+        print(len(elementit["xdata"]))
+    except ValueError:
+        print("datanlasku hajos")
 
 
 def lue_data(path):
@@ -77,90 +90,46 @@ def lue_data(path):
     ole päätteeltään .txt ja tallentaa ne dictissä oleviin listoihin xdata ja ydata.
     """
     luku = 0
+    ydata = []
     x0 = []
-    y0 = []
-    y1 = []
-    y2 = []
-    y3 = []
-    y4 = []
-    y5 = []
-    y6 = []
-    y7 = []
-    y8 = []
-    y9 = []
-    y10 = []
-    y11 = []
-    y12 = []
-    y13 = []
-    y14 = []
-    y15 = []
-    y16 = []
-    y17 = []
-    y18 = []
-    y19 = []
     files = []
+    laskuri = 0
+    k = 0
     try:
         for filename in os.listdir(path): #lukee kansion
+            files = os.listdir(path)
             if filename.endswith(".txt"):    #tarkastaa tiedostopäätteet
-                files.append(filename)
-                with open(os.path.join(path, filename)) as kohde:  #avaa tiedoston
-                    for z in kohde:
-                        lines = kohde.read()     #lukee tiedoston
-                        line = lines.split("\n")    #splittaa rivinvaihdosta listaan
-                        file_len = len(line)
-                        for i in range(file_len):
-                            rivi = line[i]
-                            try: #vaihtaa listan alkioden muodon stringistä float ja tallentaa ne listaan
-                                rivi.rstrip()
-                                lista = rivi.split(" ")
-                                ekafloat = float(lista[0])
-                                tokafloat = float(lista[1])
-                                if luku == 0:
-                                    y0.append(tokafloat)
-                                elif luku == 1:
-                                    y1.append(tokafloat)
-                                elif luku == 2:
-                                    y2.append(tokafloat)
-                                elif luku == 3:
-                                    y3.append(tokafloat)
-                                elif luku == 4:
-                                    y4.append(tokafloat)
-                                elif luku == 5:
-                                    y5.append(tokafloat)
-                                elif luku == 6:
-                                    y6.append(tokafloat)
-                                elif luku == 7:
-                                    y7.append(tokafloat)
-                                elif luku == 8:
-                                    y8.append(tokafloat)
-                                elif luku == 9:
-                                    y9.append(tokafloat)
-                                elif luku == 10:
-                                    y10.append(tokafloat)
-                                elif luku == 11:
-                                    y11.append(tokafloat)
-                                elif luku == 12:
-                                    y12.append(tokafloat)
-                                elif luku == 13:
-                                    y13.append(tokafloat)
-                                elif luku == 14:
-                                    y14.append(tokafloat)
-                                elif luku == 15:
-                                    y15.append(tokafloat)
-                                elif luku == 16:
-                                    y16.append(tokafloat)
-                                elif luku == 17:
-                                    y17.append(tokafloat)
-                                elif luku == 18:
-                                    y18.append(tokafloat)
-                                elif luku == 19:
-                                    x0.append(ekafloat)
-                                    y19.append(tokafloat)
-                            except ValueError:
-                                pass
-                        luku += 1
+                while laskuri < len(files):
+                    with open(os.path.join(path, files[laskuri])) as kohde:  #avaa tiedoston
+                        for z in kohde:
+                            ydata.append([])
+                            lines = kohde.read()     #lukee tiedoston
+                            line = lines.split("\n")    #splittaa rivinvaihdosta listaan
+                            file_len = len(line)
+                            i = 0
+                            for i in range(file_len):
+                                rivi = line[i]
+                                try: #vaihtaa listan alkioden muodon stringistä float ja tallentaa ne listaan
+                                    if not rivi:
+                                        continue
+                                    else:
+                                        rivi.rstrip()
+                                        rivi.strip("\'")
+                                        lista = rivi.split(" ")
+                                        if luku == 0:
+                                            x_timestamp = float(lista[0])
+                                            x0.append(x_timestamp)
+                                        y_float = float(lista[1])
+                                        ydata[luku].append(y_float)
+                                        continue
+                                except ValueError:
+                                    print("lukuvirhe")
+                                    pass
+                        k += 1
+                    laskuri += 1
+                    luku += 1
                     elementit["xdata"] = np.append(elementit["xdata"], x0)
-                    laske_ydata(y0, y1, y2, y3, y4, y5, y6, y7, y8, y9, y10, y11, y12, y13, y14, y15, y16, y17, y18, y19)
+                laske_ydata(ydata)
             else:
                 continue
     except FileNotFoundError:
@@ -250,7 +219,7 @@ def laske_intensiteetti():
             ik.kirjoita_tekstilaatikkoon(elementit["laatikko1"],
             "Piikin intensiteetti on: {:.4f}".format(integraali))
         except ValueError:
-            ik.kirjoita_tekstilaatikkoon(elementit["laatikko1"], "Kutale")
+            ik.kirjoita_tekstilaatikkoon(elementit["laatikko1"], "Tasoita kuvaaja ensin (poista lineaarinen tausta)")
         xpoints.clear()
     except IndexError:
         return
