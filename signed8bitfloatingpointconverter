@@ -1,0 +1,88 @@
+#Tatu Lehtola
+def binaarinteko(i, bitti):
+    luku = abs(i)
+    bit = 8
+    if bitti[0] == 0:
+        while len(bitti) < 8: #positiivisen 8bit float rankennus listaan / toimii
+            if luku - bit >= 0:
+                bitti.append(1)
+                luku = luku - bit
+                bit = bit / 2
+            else:
+                bitti.append(0)
+                bit = bit / 2
+        print(bitti)
+    
+    if bitti[0] == 1: # negatiivisen 8bit floatin rakennus / toimii
+        roundedluku = round(i, 4)
+        negbit = -15
+        while len(bitti) < 8:
+            try:
+                if negbit + bit <= roundedluku:
+                    bitti.append(1)
+                    negbit = negbit + bit
+                    bit = bit/2
+                else:
+                    bitti.append(0)
+                    bit = bit/2
+            except IndexError:
+                pass
+    if bitti[0] == 1:
+        print(bitti)
+
+def takaisinmuunnos(bitti):
+    bit = 8
+    floatti = float(0)
+    l=1
+    j = 0
+    if bitti[j] == 1: #negatiivisen luvun laskeminen binääristä floatiksi aka alkuperäisen likiarvo / toimii
+        floatti = floatti - 15
+        try:
+            for alkio in bitti:
+                if bitti[l] == 1:
+                    floatti = floatti + bit
+                    bit = bit/2
+                    l+=1
+                else:
+                    bit = bit/2
+                    l+=1
+        except IndexError:
+            pass
+
+    if bitti[j] == 0: #positiivisen luvun kasaaminen / toimii
+        print("positiivinen luku")
+        try:
+            for alkio in bitti:
+                if bitti[l] == 1:
+                    floatti = floatti + bit
+                    bit = bit / 2
+                else:
+                    bit = bit/2
+                l+=1
+        except IndexError:
+            pass
+    return floatti
+
+def main():
+    try:
+        i = float(input("anna desimaaliluku: "))
+        bitti = []
+        print(i)
+        if i == 0:
+            print("olet kakka")
+        if i > 0:
+            bitti.append(0)
+            print("merkkibitti on 0")
+        else:
+            bitti.append(1)
+            print("merkkibitti on 1")
+        binaarinteko(i, bitti)
+        floatingpointti = takaisinmuunnos(bitti)
+        print(floatingpointti)
+        return 0
+    except ValueError:
+        return 1
+
+lopetus = 0
+while lopetus == 0:
+    lopetus = main()
