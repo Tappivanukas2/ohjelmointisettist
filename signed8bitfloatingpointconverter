@@ -3,7 +3,7 @@ def binaarinteko(i, bitti):
     luku = abs(i)
     bit = 8
     if bitti[0] == 0:
-        while len(bitti) < 8: #positiivisen 8bit float rankennus listaan / toimii
+        while len(bitti) < 8: #positiivisen 8bit float rakennus listaan / toimii
             if luku - bit >= 0:
                 bitti.append(1)
                 luku = luku - bit
@@ -50,7 +50,6 @@ def takaisinmuunnos(bitti):
             pass
 
     if bitti[j] == 0: #positiivisen luvun kasaaminen / toimii
-        print("positiivinen luku")
         try:
             for alkio in bitti:
                 if bitti[l] == 1:
@@ -63,22 +62,27 @@ def takaisinmuunnos(bitti):
             pass
     return floatti
 
+def nolla(bitti):
+    while len(bitti) < 8:
+        bitti.append(0)
+
 def main():
     try:
         i = float(input("anna desimaaliluku: "))
         bitti = []
         print(i)
         if i == 0:
-            print("olet kakka")
-        if i > 0:
-            bitti.append(0)
-            print("merkkibitti on 0")
+            nolla(bitti)
         else:
-            bitti.append(1)
-            print("merkkibitti on 1")
+            if i > 0:
+                bitti.append(0)
+                print("merkkibitti on 0")
+            else:
+                bitti.append(1)
+                print("merkkibitti on 1")
         binaarinteko(i, bitti)
         floatingpointti = takaisinmuunnos(bitti)
-        print(floatingpointti)
+        print("pyöristetty luku on:", floatingpointti)
         return 0
     except ValueError:
         return 1
