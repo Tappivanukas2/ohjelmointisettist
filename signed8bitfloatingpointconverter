@@ -11,7 +11,6 @@ def binaarinteko(i, bitti):
             else:
                 bitti.append(0)
                 bit = bit / 2
-        print(bitti)
     
     if bitti[0] == 1: # negatiivisen 8bit floatin rakennus / toimii
         roundedluku = round(i, 4)
@@ -27,8 +26,6 @@ def binaarinteko(i, bitti):
                     bit = bit/2
             except IndexError:
                 pass
-    if bitti[0] == 1:
-        print(bitti)
 
 def takaisinmuunnos(bitti):
     bit = 8
@@ -81,6 +78,8 @@ def main():
                 bitti.append(1)
                 print("merkkibitti on 1")
         binaarinteko(i, bitti)
+        print("Binääri: {}{}{}{}{},{}{}{}".format(bitti[0], bitti[1], bitti[2],
+        bitti[3], bitti[4], bitti[5], bitti[6], bitti[7]))
         floatingpointti = takaisinmuunnos(bitti)
         print("pyöristetty luku on:", floatingpointti)
         return 0
